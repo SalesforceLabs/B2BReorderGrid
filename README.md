@@ -2,7 +2,7 @@
 	<img align="right" width="150" src="images/qbranch_logo.gif">
 </div>
 
-# [AppExchange Listing Name](https://appexchange.my.salesforce.com/)
+# [B2B Reorder Grid](https://appexchange.my.salesforce.com/)
 
 #### _Catchy title about your AppExchange Offering_
 

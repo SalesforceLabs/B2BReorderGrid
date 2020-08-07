@@ -1,0 +1,23 @@
+<template>
+    <lightning-layout vertical-align="end">
+        <lightning-layout-item padding="around-x-small" size="4" flexibility="auto">
+            <lightning-input 
+                type="number"
+                name={quantity}
+                label=""
+                value={quantity}
+                onchange={changeQuantity}
+                variant="label-hidden"
+                class="">
+            </lightning-input>
+        </lightning-layout-item>
+        <lightning-layout-item padding="around-xx-small" size="4" flexibility="auto">            
+            <lightning-button-icon
+                icon-name="utility:add"
+                alternative-text="Add quantity"
+                class="slds-var-m-left_xx-small"
+                onclick={addQuantity}>
+            </lightning-button-icon>
+        </lightning-layout-item>
+    </lightning-layout>
+</template>

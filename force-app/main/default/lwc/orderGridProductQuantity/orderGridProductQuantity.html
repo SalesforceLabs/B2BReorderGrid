@@ -1,0 +1,15 @@
+<template>
+    <lightning-layout vertical-align="end">
+        <lightning-layout-item padding="around-x-small" size="10" flexibility="auto">
+            <lightning-input 
+                type="number"
+                name="totalQuantity"
+                label=""
+                value={_quantity}
+                onchange={changeQuantity}
+                variant="label-hidden"
+                class="">
+            </lightning-input>
+        </lightning-layout-item>
+    </lightning-layout>
+</template>

@@ -1,0 +1,12 @@
+<template>
+    <thead>
+        <tr class="slds-line-height_reset">
+            <template for:each={columnHeaders} for:item="columnHeader">
+                <th class="" scope="col" key={columnHeader.apiName}>
+                    <div class="slds-truncate" title={columnHeader.label} key={columnHeader.apiName}>{columnHeader.label}</div>
+                </th>
+            </template>
+        </tr>
+    </thead>
+      
+</template>
