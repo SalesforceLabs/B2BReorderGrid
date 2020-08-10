@@ -50,36 +50,48 @@ private class OrderGridControllerTest{
         System.assertEquals(null, opwList);
     }
 
-    // @isTest
-    // static void addToCartTest(){
-    //     List<CartProductWrapper> cartProducts = new List<CartProductWrapper>();
-    //     CartProductWrapper cartProduct = new CartProductWrapper();
-    //     cartProduct.productId = '12345';
-    //     cartProduct.quantity = 2;
-    //     cartProducts.add(cartProduct);
+    @isTest
+    static void addToCartTest(){
+        List<CartProductWrapper> cartProducts = new List<CartProductWrapper>();
+        CartProductWrapper cartProduct = new CartProductWrapper();
+        cartProduct.productId = '12345';
+        cartProduct.quantity = 2;
+        cartProducts.add(cartProduct);
 
-    //     String cartProductsJSON = JSON.serialize(cartProducts);
+        String cartProductsJSON = JSON.serialize(cartProducts);
 
-    //     Test.startTest();
-    //         List<ConnectApi.CartItemInput> cartItemInputs = orderGridController.addToCart(cartProductsJSON, null, null);
-    //     Test.stopTest();
+        Test.startTest();
+            List<CartProductWrapper> cartProductWrappers = orderGridController.addToCart(cartProductsJSON, null, null);
+        Test.stopTest();
 
-    //     System.assertEquals(cartProduct.productId, cartItemInputs[0].productId);
-    //     System.assertEquals(cartProduct.quantity, Integer.valueOf(cartItemInputs[0].quantity));
-    // }
+        System.assertEquals(cartProduct.productId, cartProductWrappers[0].productId);
+        System.assertEquals(cartProduct.quantity, cartProductWrappers[0].quantity);
+    }
 
     @isTest
     static void orderProductsNotAccessibleTest(){
         User standardUser = OrderGridControllerTestUtility.createStandardUser();
 
-        List<OrderProductWrapper> opwList = new List<OrderProductWrapper>();
+        List<OrderProductWrapper> opwList;
+        Boolean canReadOrderProducts;
+        Boolean canReadOrders;
+        Boolean canReadProducts;
+        Boolean canReadWebStoreNetworks;
 
         System.runAs(standardUser){
             Test.startTest();
                 opwList = orderGridController.getOrderProducts(null, null, '12345');
+                canReadOrderProducts = orderGridController.canReadOrderProducts();
+                canReadOrders = orderGridController.canReadOrders();
+                canReadProducts = orderGridController.canReadProducts();
+                canReadWebStoreNetworks = orderGridController.canReadWebStoreNetworks();
             Test.stopTest();
         }
 
         System.assertEquals(null, opwList);
+        System.assertEquals(false, canReadOrderProducts);
+        System.assertEquals(false, canReadOrders);
+        System.assertEquals(false, canReadProducts);
+        System.assertEquals(false, canReadWebStoreNetworks);
     }
 }

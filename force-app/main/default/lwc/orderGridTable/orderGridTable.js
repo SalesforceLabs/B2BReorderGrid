@@ -96,7 +96,7 @@ export default class OrderGridTable extends LightningElement{
             this.productQuantities = [];
             this.totalProductQuantity = 0;
             this.addToCartDisabled = true;
-            this.sortObject = null;
+            this._sortObject = null;
             this.createTable();
             this.showNoOrdersMessage = false;
             this.showTable = true;
@@ -129,7 +129,7 @@ export default class OrderGridTable extends LightningElement{
             this.productQuantities = [];
             this.totalProductQuantity = 0;
             this.addToCartDisabled = true;
-            this.sortObject = null;
+            this._sortObject = null;
             this.createTable();
             this.showNoMatchingProductsMessage = false;
             this.showTable = true;
@@ -337,6 +337,8 @@ export default class OrderGridTable extends LightningElement{
         else if(monthNumber === 11){
             return 'Dec';
         }
+
+        return null;
     }
 
     addProductQuantityHandler(event){

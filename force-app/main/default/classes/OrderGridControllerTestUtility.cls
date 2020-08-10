@@ -85,9 +85,9 @@ public class OrderGridControllerTestUtility{
         // Create a unique UserName
         String uniqueUserName = 'StandardUser' + DateTime.now().getTime() + '@testorg.com';
         
-        Profile p = [SELECT Id FROM Profile WHERE Name='Standard User'];
-        User user = new User(Alias = 'stduser', 
-                             Email ='stduser@testorg.com',
+        Profile p = [SELECT Id FROM Profile WHERE Name='Chatter Free User'];
+        User user = new User(Alias = 'chatuser', 
+                             Email ='chatuser@testorg.com',
                              EmailEncodingKey ='UTF-8',
                              LastName ='Testing',
                              LanguageLocaleKey ='en_US',

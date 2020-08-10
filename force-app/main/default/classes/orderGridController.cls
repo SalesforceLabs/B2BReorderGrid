@@ -109,53 +109,49 @@ public with sharing class orderGridController{
         return products;
     }
 
+    //returning wrapper classes because I could figure out a way to pull values from a ConnectApi.BatchInput
+    //in my test class. Returning a list of ConnectApi.CartItemInput records causes an error on the client side
+    //even though there aren't any Apex errors which makes it so I can't do accurate error handling.
+    //Returning a list of wrapper classes solves both problems.
+
     @AuraEnabled
-    public static String addToCart(String productsJSON, String communityId, String effectiveAccountId){
+    public static List<CartProductWrapper> addToCart(String productsJSON, String communityId, String effectiveAccountId){
         String webstoreId = getStoreId(communityId);
 
         List<Object> cartProducts = (List<Object>)JSON.deserializeUntyped(productsJSON);
         List<ConnectApi.BatchInput> batchInputList = new List<ConnectApi.BatchInput>();
-        List<ConnectApi.CartItemInput> cartItems = new List<ConnectApi.CartItemInput>();
+        List<CartProductWrapper> cartItemWrappers = new List<CartProductWrapper>(); 
 
         for(Object cartProduct : cartProducts){
             Map<String, Object> cpObjectMap = (Map<String, Object>)cartProduct;
             ConnectApi.CartItemInput cartItem = new ConnectApi.CartItemInput();
+            CartProductWrapper cartItemWrapper = new CartProductWrapper();
+
             cartItem.productId = (String)cpObjectMap.get('productId');
+            cartItemWrapper.productId = cartItem.productId;
+
             Integer quantity = (Integer)cpObjectMap.get('quantity');
             cartItem.quantity = quantity.format();
-            cartItem.type = ConnectApi.CartItemType.Product;
-            cartItems.add(cartItem);
+            cartItemWrapper.quantity = quantity;
 
+            cartItem.type = ConnectApi.CartItemType.Product;
+            
             ConnectApi.BatchInput batchInput = new ConnectApi.BatchInput(cartItem);
             batchInputList.add(batchInput);
+            cartItemWrappers.add(cartItemWrapper);
         }
 
         if(!Test.isRunningTest()){
-            try{
-                List<ConnectApi.BatchResult> batchResults = ConnectApi.CommerceCart.addItemsToCart(webstoreId, effectiveAccountId, 'active', batchInputList);
-                System.debug('batchResults: ' + batchResults);
-            }
-            catch(ConnectApi.ConnectApiException e){
-                System.debug('ConnectApi.CommerceCart.addItemsToCart ConnectApiException: ' + e);
-            }
-            catch(ConnectApi.NotFoundException e){
-                System.debug('ConnectApi.CommerceCart.addItemsToCart NotFoundException: ' + e);
-            }
-            catch(ConnectApi.RateLimitException e){
-                System.debug('ConnectApi.CommerceCart.addItemsToCart RateLimitException: ' + e);
-            }
+            try{List<ConnectApi.BatchResult> batchResults = ConnectApi.CommerceCart.addItemsToCart(webstoreId, effectiveAccountId, 'active', batchInputList);}
+            catch(ConnectApi.ConnectApiException e){System.debug('ConnectApi.CommerceCatalog.getProduct ConnectApiException: ' + e); return null;}
+            catch(ConnectApi.NotFoundException e){System.debug('ConnectApi.CommerceCatalog.getProduct NotFoundException: ' + e); return null;}
+            catch(ConnectApi.RateLimitException e){System.debug('ConnectApi.CommerceCatalog.getProduct RateLimitException: ' + e); return null;}
         }
 
-        String cartItemsString = JSON.serialize(cartItems);
-        System.debug('cartItemsString: ' + cartItemsString);
-        return cartItemsString;
-        // return 'success';
+        return cartItemWrappers;
     }
 
     public static String getURLBase(){
-        //Domain domain = [SELECT Domain FROM Domain];
-        //https://sfb2bcompcp--c.documentforce.com/cms/media/RcNgD9nFCq.RXuuctlYoQLo2VHsDjGaAU5uBN7XaXPY=
-
         List<Domain__mdt> domains = [SELECT Id, DeveloperName, Domain__c FROM Domain__mdt WHERE DeveloperName = 'My_Domain'];
         String domain = domains.get(0).Domain__c;
     
@@ -163,6 +159,7 @@ public with sharing class orderGridController{
         return baseURL;
     }
 
+    @TestVisible
     private static Boolean canReadOrderProducts(){
         Boolean canReadOrderProducts = false;
         if(Schema.sObjectType.OrderItem.fields.Quantity.isAccessible()){
@@ -171,6 +168,7 @@ public with sharing class orderGridController{
         return canReadOrderProducts;
     }
 
+    @TestVisible
     private static Boolean canReadOrders(){
         Boolean canReadOrders = false;
         if(Schema.sObjectType.Order.fields.OrderedDate.isAccessible() &&
@@ -180,6 +178,7 @@ public with sharing class orderGridController{
         return canReadOrders;
     }
 
+    @TestVisible
     private static Boolean canReadProducts(){
         Boolean canReadProducts = false;
         if(Schema.sObjectType.Product2.fields.Name.isAccessible() &&
@@ -189,6 +188,7 @@ public with sharing class orderGridController{
         return canReadProducts;
     }
 
+    @TestVisible
     private static Boolean canReadWebStoreNetworks(){
         Boolean canReadWebStoreNetworks = false;
         if(Schema.sObjectType.WebStoreNetwork.fields.WebStoreId.isAccessible() &&
