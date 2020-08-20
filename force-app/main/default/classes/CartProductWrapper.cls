@@ -1,3 +1,13 @@
+/*
+==========================================
+    Title: CartProductWrapper
+    Purpose: Wrapper class to store cart
+        products.
+    Author: Clay Phillips
+    Date: 08/20/2020 
+==========================================
+*/
+
 public class CartProductWrapper{
     @AuraEnabled
     public String productId{get;set;}

@@ -1,3 +1,13 @@
+/*
+==========================================
+    Title: orderGridHeader
+    Purpose: Header component for the 
+        order grid.
+    Author: Clay Phillips
+    Date: 08/20/2020 
+==========================================
+*/
+
 import {LightningElement, api} from 'lwc';
 
 export default class OrderGridHeader extends LightningElement{
@@ -7,10 +17,12 @@ export default class OrderGridHeader extends LightningElement{
     nameSortIcon = 'utility:sort';
     skuSortIcon = 'utility:sort';
 
+    //Creates the year array when the component loads
     connectedCallback(){
         this.createYearArray();    
     }
 
+    //Method to create an array of years going back 5 years
     createYearArray(){
         const today = new Date();
         const year = today.getFullYear();
@@ -22,6 +34,7 @@ export default class OrderGridHeader extends LightningElement{
         this.yearValues.push(year - 4);
     }
 
+    //Change handler for the year dropdown that sends the year value to orderGridMain
     selectYear(event){
         const detail = {
             orderYear: parseInt(event.target.value, 10)
@@ -35,11 +48,13 @@ export default class OrderGridHeader extends LightningElement{
         this.dispatchEvent(selectYearEvent);
     }
 
+    //Change handler for the search input box
     updateSearchText(event){
         const searchText = event.target.value;
         this.sendSearchEvent(searchText);
     }
 
+    //Sends the search text to orderGridMain
     sendSearchEvent(searchText){
         const detail = {
             searchText: searchText
@@ -53,6 +68,7 @@ export default class OrderGridHeader extends LightningElement{
         this.dispatchEvent(searchEvent);
     }
 
+    //Sort by name button handler
     sortByProductName(){
         let sortDirection = '';
         if(this.nameSortIcon === 'utility:sort' || this.nameSortIcon === 'utility:arrowdown'){
@@ -68,6 +84,7 @@ export default class OrderGridHeader extends LightningElement{
         this.sendSortEvent('name', sortDirection);
     }
 
+    //Sort by SKU button handler
     sortByProductSKU(){
         let sortDirection = '';
         if(this.skuSortIcon === 'utility:sort' || this.skuSortIcon === 'utility:arrowdown'){
@@ -83,6 +100,7 @@ export default class OrderGridHeader extends LightningElement{
         this.sendSortEvent('SKU', sortDirection);
     }
 
+    //Sends a sort object to orderGridMain
     sendSortEvent(sortField, sortDirection){
         const detail = {
             sortField: sortField,
@@ -97,6 +115,7 @@ export default class OrderGridHeader extends LightningElement{
         this.dispatchEvent(sortEvent);
     }
 
+    //Reset button handler that sends a reset event to orderGridMain
     resetQuantities(){
         const detail = {
             randomNumber: Math.random()

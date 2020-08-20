@@ -1,7 +1,7 @@
 {
   "orgName": "clay.phillips company",
   "edition": "Developer",
-  "features": [],
+  "features": ["MultiCurrency","Communities", "B2BCommerce", "OrderManagement"],
   "settings": {
     "lightningExperienceSettings": {
         "enableS1DesktopEnabled": true
@@ -13,6 +13,17 @@
     },
     "mobileSettings": {
         "enableS1EncryptedStoragePref2": false
+    },
+    "communitiesSettings": {
+      "enableNetworksEnabled": true
+    },
+    "orderManagementSettings": {
+      "enableOrderManagement": true
+    },
+    "orderSettings": {
+      "enableOrders": true,
+      "enableEnhancedCommerceOrders": true,
+      "enableOptionalPricebook": true
     }
   }
 }

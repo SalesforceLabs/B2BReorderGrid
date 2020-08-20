@@ -1,3 +1,13 @@
+/*
+==========================================
+    Title: orderGridTable
+    Purpose: Component that displays the
+        order grid.
+    Author: Clay Phillips
+    Date: 08/20/2020 
+==========================================
+*/
+
 import {LightningElement, api} from 'lwc';
 
 export default class OrderGridTable extends LightningElement{
@@ -8,6 +18,7 @@ export default class OrderGridTable extends LightningElement{
         return this._sortObject;
     }
 
+    //Setter for sortObject that calls the sortTableRows() method 
     set sortObject(value){
         this._sortObject = value;
         if(this._sortObject){
@@ -21,6 +32,7 @@ export default class OrderGridTable extends LightningElement{
         return this._orderYear;
     }
 
+    //Setter for orderYear that calls the filterOrderProductsByYear() method 
     set orderYear(value){
         this._orderYear = value;
         this.filterOrderProductsByYear();
@@ -32,13 +44,23 @@ export default class OrderGridTable extends LightningElement{
         return this._searchText;
     }
 
+    //Setter for searchText that calls the filterOrderProductsByNameSKU() method
+    //if there is search text or shows all of the OPs again if there isn't any search text.
     set searchText(value){
         this._searchText = value;
         if(this._searchText.length > 0){
             this.filterOrderProductsByNameSKU();
         }
         else{
-            this.filterOrderProductsByYear();
+            this.filteredOrderProducts = this.filteredOrderProductsCopy;
+            this.orderColumns = [];
+            this.orderColumnStrings = [];
+            this.tableRows = [];
+            this.productArray = [];
+            this._sortObject = null;
+            this.createTable();
+            this.showNoOrdersMessage = false;
+            this.showTable = true;
         }
     }
     _searchText;
@@ -57,6 +79,8 @@ export default class OrderGridTable extends LightningElement{
     _resetQuantities
 
     filteredOrderProducts = [];
+
+    //Needed for searching to store the original order product list without filters
     filteredOrderProductsCopy = [];
     orderColumns = [];
     orderColumnStrings = [];
@@ -72,6 +96,8 @@ export default class OrderGridTable extends LightningElement{
 
     addToCartDisabled = true;
 
+
+    //Filters the order products by year
     filterOrderProductsByYear(){
         if(!this._orderYear){
             const today = new Date();
@@ -109,6 +135,7 @@ export default class OrderGridTable extends LightningElement{
         this.sendShowTableEvent();
     }
 
+    //Filters the order products by name or SKU
     filterOrderProductsByNameSKU(){
         let filteredOrderProducts = [];
         this.filteredOrderProductsCopy.forEach((op) =>{
@@ -126,9 +153,6 @@ export default class OrderGridTable extends LightningElement{
             this.orderColumnStrings = [];
             this.tableRows = [];
             this.productArray = [];
-            this.productQuantities = [];
-            this.totalProductQuantity = 0;
-            this.addToCartDisabled = true;
             this._sortObject = null;
             this.createTable();
             this.showNoMatchingProductsMessage = false;
@@ -140,11 +164,13 @@ export default class OrderGridTable extends LightningElement{
         }
     }
 
+    //Parses the order items and creates the table
     createTable(){
         this.parseOrderItems();
         this.createTableRows();
     }
 
+    //Creates the date column headers and product array needed for the table
     parseOrderItems(){
         this.filteredOrderProducts.forEach((op) =>{
             this.createDateColumnHeader(op);
@@ -152,6 +178,7 @@ export default class OrderGridTable extends LightningElement{
         })
     }
 
+    //Uses the OP Ordered Dates to date column headers for the table 
     createDateColumnHeader(op){
         const orderedDateRaw = new Date(op.orderedDate);
         const orderedDate = new Date(orderedDateRaw.getTime() + orderedDateRaw.getTimezoneOffset() * 60000); //needed to account for the time offset
@@ -173,8 +200,9 @@ export default class OrderGridTable extends LightningElement{
         this.orderColumns.push(orderColumn);
     }
 
+    //Creates the array of products needed to create the table
     createProductArray(op){
-        let productImageURL = 'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSwBrSo8HehhfVpXFpR4YXHM9LSpOZv-TZeogIqNbKWP2DimHiL9YI&usqp=CAc';
+        let productImageURL = '';
         if(op.productImageURL){
             productImageURL = op.productImageURL;
         }
@@ -195,6 +223,7 @@ export default class OrderGridTable extends LightningElement{
         this.productArray.push(productObjectString);
     }
 
+    //Creates the table row objects needed for the table
     createTableRows(){
         for(let i = 0; i < this.productArray.length; i++){
             const productObject = JSON.parse(this.productArray[i]);
@@ -208,7 +237,8 @@ export default class OrderGridTable extends LightningElement{
                         && this.filteredOrderProducts[c].orderId === order.orderId){
                             const uniqueQuantityObj = {
                                 quantity: this.filteredOrderProducts[c].quantity,
-                                uniqueQuantity: this.filteredOrderProducts[c].quantity + ' ' + Math.random()
+                                //Used as a unique key for the HTML for each loop
+                                uniqueQuantity: this.filteredOrderProducts[c].quantity + ' ' + Math.random() 
                             };
 
                             productObject.quantityValues.push(uniqueQuantityObj);
@@ -216,6 +246,9 @@ export default class OrderGridTable extends LightningElement{
                             break;
                     }
                 }
+
+                //Sets the quantiy to 0 for the order product for this particular order
+                //if there aren't any of this product in the order
                 if(!matchFound){
                     const uniqueQuantityObj = {
                         quantity: 0,
@@ -231,6 +264,7 @@ export default class OrderGridTable extends LightningElement{
         this.tableRowOne = this.tableRows[0];
     }
 
+    //Main method to sort the table rows. Calls either the sortByFieldAscending() or sortByFieldDescending() method
     sortTableRows(){
         if(this._sortObject.sortDirection === 'ASC'){
             this.sortByFieldAscending(this._sortObject.sortField);
@@ -240,6 +274,7 @@ export default class OrderGridTable extends LightningElement{
         this.sortByFieldDescending(this._sortObject.sortField);
     }
 
+    //Sorts the table rows in ascending order by product name or SKU
     sortByFieldAscending(fieldName){
         function compare(a, b){
             const valueA = a[fieldName];
@@ -270,6 +305,7 @@ export default class OrderGridTable extends LightningElement{
         this.tableRows = [...this.tableRows];
     }
 
+    //Sorts the table rows in descending order by product name or SKU
     sortByFieldDescending(fieldName){
         function compare(a, b){
             const valueA = a[fieldName];
@@ -300,47 +336,49 @@ export default class OrderGridTable extends LightningElement{
         this.tableRows = [...this.tableRows];
     }
 
+    //Uses the month number to return a abbreaviated month string
     getMonthString(monthNumber){
         if(monthNumber === 0){
-            return 'Jan';
+            return 'Jan.';
         }
         else if(monthNumber === 1){
-            return 'Feb';
+            return 'Feb.';
         }
         else if(monthNumber === 2){
-            return 'Mar';
+            return 'Mar.';
         }
         else if(monthNumber === 3){
-            return 'Apr';
+            return 'Apr.';
         }
         else if(monthNumber === 4){
             return 'May';
         }
         else if(monthNumber === 5){
-            return 'Jun';
+            return 'June';
         }
         else if(monthNumber === 6){
-            return 'Jul';
+            return 'July';
         }
         else if(monthNumber === 7){
-            return 'Aug';
+            return 'Aug.';
         }
         else if(monthNumber === 8){
-            return 'Sep';
+            return 'Sept.';
         }
         else if(monthNumber === 9){
-            return 'Oct';
+            return 'Oct.';
         }
         else if(monthNumber === 10){
-            return 'Nov';
+            return 'Nov.';
         }
         else if(monthNumber === 11){
-            return 'Dec';
+            return 'Dec.';
         }
 
         return null;
     }
 
+    //Handler to update the productQuantities array with the products that were selected
     addProductQuantityHandler(event){
         let productFound = false;
         for(let i = 0; i < this.productQuantities.length; i++){
@@ -369,6 +407,7 @@ export default class OrderGridTable extends LightningElement{
         this.addToCartDisabled = false;
     }
 
+    //Handler to update productQuantities with all of the products from the selected order
     addOrderQuantitiesHandler(event){
         for(let i = 0; i < this.filteredOrderProducts.length; i++){
             const orderProduct = this.filteredOrderProducts[i];
@@ -402,6 +441,7 @@ export default class OrderGridTable extends LightningElement{
         this.addToCartDisabled = false;
     }
 
+    //Handler to update productQuantities with the new product total from the quantity column
     changeProductQuantityHandler(event){
         let productFound = false;
         for(let i = 0; i < this.productQuantities.length; i++){
@@ -446,6 +486,7 @@ export default class OrderGridTable extends LightningElement{
         }
     }
 
+    //Sends the show table event to render the table along with the search bar, sort and reset buttons
     sendShowTableEvent(){
         const detail = {
             showTable: this.showTable
@@ -459,6 +500,8 @@ export default class OrderGridTable extends LightningElement{
         this.dispatchEvent(showTableEvent);
     }
 
+    //Handler for the Add to Cart button that sends an event to orderGridMain
+    //to call the apex method to add the products to the cart
     addToCart(){
         const detail = {
             cartProducts: this.productQuantities

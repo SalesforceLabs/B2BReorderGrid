@@ -1,3 +1,14 @@
+/*
+==========================================
+    Title: OrderGridControllerTestUtility
+    Purpose: Test utility class for
+        OrderGridControllerTest. 
+    Author: Clay Phillips
+    Date: 08/20/2020 
+==========================================
+*/
+
+//Main method that creates all of the test records needed for test execution and returns and map of their Ids.
 @isTest
 public class OrderGridControllerTestUtility{
     public static Map<String, String> createTestRecords(){
@@ -9,6 +20,7 @@ public class OrderGridControllerTestUtility{
         String userId = createAdminUser();
         String orderId = createOrder(accountId, pbId, userId);
         String orderProductId = createOrderProduct(orderId, productId, pbeId);
+        activateOrder(orderId);
 
         Map<String, String> recordIdMap = new Map<String,String>();
         recordIdMap.put('accountId', accountId);
@@ -19,6 +31,7 @@ public class OrderGridControllerTestUtility{
         return recordIdMap;
     }
 
+    //Method to create a test Product record.
     private static String createProduct(){
         Product2 product = new Product2();
         product.Name = 'test product 1231897';
@@ -30,6 +43,7 @@ public class OrderGridControllerTestUtility{
         return product.Id;
     }
 
+    //Method to create a test Price Book record.
     private static String createPriceBook(){
         Pricebook2 pb = new Pricebook2();
         pb.Name = 'test price book';
@@ -39,6 +53,7 @@ public class OrderGridControllerTestUtility{
         return pb.Id;
     }
 
+    //Method to create a test Price Book Entry record.
     private static String createPriceBookEntry(String productId, String pbId){
         PricebookEntry pbe = new PricebookEntry();
         pbe.CurrencyIsoCode = 'USD';
@@ -52,6 +67,7 @@ public class OrderGridControllerTestUtility{
         return pbe.Id;
     }
 
+    //Method to create a test Account record.
     private static String createAccount(){
         Account account = new Account();
         account.Name = 'Test Account';
@@ -61,6 +77,7 @@ public class OrderGridControllerTestUtility{
         return account.Id;
     }
 
+    //Method to create a test admin User record.
     private static String createAdminUser(){
         // Create a unique UserName
         String uniqueUserName = 'SystemAdministrator' + DateTime.now().getTime() + '@testorg.com';
@@ -81,9 +98,10 @@ public class OrderGridControllerTestUtility{
         return user.Id;
     }
 
-    public static User createStandardUser(){
+    //Method to create a test chatter User record.
+    public static User createChatterUser(){
         // Create a unique UserName
-        String uniqueUserName = 'StandardUser' + DateTime.now().getTime() + '@testorg.com';
+        String uniqueUserName = 'ChatterUser' + DateTime.now().getTime() + '@testorg.com';
         
         Profile p = [SELECT Id FROM Profile WHERE Name='Chatter Free User'];
         User user = new User(Alias = 'chatuser', 
@@ -101,6 +119,7 @@ public class OrderGridControllerTestUtility{
         return user;
     }
 
+    //Method to create a test Order record.
     private static String createOrder(String accountId, String pbId, String userId){
         Order order = new Order();
         order.AccountId = accountId;
@@ -115,6 +134,15 @@ public class OrderGridControllerTestUtility{
         return order.Id;
     }
 
+    //Method to activate the Order record.
+    private static void activateOrder(String orderId){
+        Order order = [SELECT Id FROM Order WHERE Id = :orderId LIMIT 1];
+
+        order.Status = 'Activated';
+        update order;
+    }
+
+    //Method to create a test Order Product record.
     private static String createOrderProduct(String orderId, String productId, String pbeId){
         OrderItem op = new OrderItem();
         op.OrderId = orderId;
@@ -127,17 +155,7 @@ public class OrderGridControllerTestUtility{
         return op.Id;
     }
 
-    private static String createStore(){
-        WebStore store = new WebStore();
-        store.name = 'test store';
-        store.CurrencyIsoCode = 'USD';
-        store.DefaultLanguage = 'en_US';
-        store.SupportedLanguages = 'en_US';
-        insert store;
-
-        return store.Id;
-    }
-
+    //Method to return mocked ConnectApi.ProductDetail records for testing.
     public static List<ConnectApi.ProductDetail> getProductsTest(String productId){
         List<ConnectApi.ProductDetail> products = new List<ConnectApi.ProductDetail>();
 
@@ -146,7 +164,6 @@ public class OrderGridControllerTestUtility{
         ConnectApi.ProductMedia pm = new ConnectApi.ProductMedia();
         pm.url = '';
         product.defaultImage = pm;
-
         products.add(product);
 
         return products;

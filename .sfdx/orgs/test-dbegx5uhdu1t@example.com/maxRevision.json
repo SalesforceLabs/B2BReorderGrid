@@ -1,0 +1,15 @@
+{
+    "serverMaxRevisionCounter": 2,
+    "sourceMembers": {
+        "FlexiPage__OMConsole_UtilityBar": {
+            "serverRevisionCounter": 1,
+            "lastRetrievedFromServer": null,
+            "memberType": "FlexiPage"
+        },
+        "AppMenu__AppSwitcher": {
+            "serverRevisionCounter": 2,
+            "lastRetrievedFromServer": null,
+            "memberType": "AppMenu"
+        }
+    }
+}

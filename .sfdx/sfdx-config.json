@@ -1,3 +1,5 @@
 {
-    "defaultusername": "B2B"
+    "defaultusername": "B2B2",
+    "defaultdevhubusername": "PartnerDevHub",
+    "apiVersion": "49.0"
 }

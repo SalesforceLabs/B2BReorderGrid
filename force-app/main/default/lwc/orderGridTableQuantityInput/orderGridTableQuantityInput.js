@@ -4,17 +4,23 @@ export default class OrderGridTableQuantityInput extends LightningElement{
     @api quantity;
     @api productId;
 
+    _quantity;
+
+    connectedCallback(){
+        this._quantity = this.quantity;   
+    }
+
     changeQuantity(event){
         if(event.target.value.length > 0){
-            this.quantity = parseInt(event.target.value, 10);
+            this._quantity = parseInt(event.target.value, 10);
         }
     }
 
     addQuantity(){
-        if(this.quantity && this.quantity > 0){
+        if(this._quantity && this._quantity > 0){
             const detail = {
                 productId: this.productId,
-                quantity: this.quantity
+                quantity: this._quantity
             };
 
             const addProductQuantityEvent = new CustomEvent('addproductquantityevent', {

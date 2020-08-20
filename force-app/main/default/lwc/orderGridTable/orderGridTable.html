@@ -33,11 +33,11 @@
                         </th>
                         <template for:each={tableRow.quantityValues} for:item="quantityObj">
                             <th data-label={quantityObj.quantity} scope="row" key={quantityObj.uniqueQuantity}>
-                                <c-order-grid-table-quantity-input
+                                <c-order-grid-o-p-quantity
                                     quantity={quantityObj.quantity}
                                     product-id={tableRow.Id}
                                     onaddproductquantityevent={addProductQuantityHandler}>
-                                </c-order-grid-table-quantity-input>
+                                </c-order-grid-o-p-quantity>
                             </th>
                         </template>
                         <th data-label="totalQuantity" scope="row">
@@ -59,8 +59,8 @@
                         </th>
                     </template>
                     <th data-label="totalNumberProducts" scope="row">
-                        <p class="slds-text-title_bold slds-align_absolute-center">
-                            {totalProductQuantity}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <p class="slds-text-title_bold alignTotal">
+                            {totalProductQuantity}
                         </p>
                     </th>
                 </tr>
@@ -80,6 +80,6 @@
             </lightning-layout-item>
         </lightning-layout>
     </div>
-    <h1 if:true={showNoOrdersMessage}>There are no orders for {_orderYear}.</h1>
-    <h1 if:true={showNoMatchingProductsMessage}>There are no matching products.</h1>
+    <h1 if:true={showNoOrdersMessage} class="errorMessage">You don't have any orders for {_orderYear}.</h1>
+    <h1 if:true={showNoMatchingProductsMessage} class="errorMessage">There are no matching products.</h1>
 </template>

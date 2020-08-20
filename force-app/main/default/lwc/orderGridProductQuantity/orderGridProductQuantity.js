@@ -1,3 +1,13 @@
+/*
+==========================================
+    Title: orderGridProductQuantity
+    Purpose: Component that displays the 
+        total quantity for the product.
+    Author: Clay Phillips
+    Date: 08/20/2020 
+==========================================
+*/
+
 import {LightningElement, api} from 'lwc';
 
 export default class OrderGridProductQuantity extends LightningElement{
@@ -8,6 +18,7 @@ export default class OrderGridProductQuantity extends LightningElement{
         return this._productQuantities;
     }
 
+    //Uses the productQuantities array that's passed in to pull the correct quantity for the product
     set productQuantities(value){
         this._productQuantities = value;
 
@@ -30,6 +41,7 @@ export default class OrderGridProductQuantity extends LightningElement{
     _productQuantities;
     _quantity;
 
+    //Centers the number in the lightning input text since it can't be done directly in the HTML markup
     renderedCallback() {
         const style = document.createElement('style');
         style.innerText = `c-order-grid-product-quantity .slds-input {
@@ -38,10 +50,10 @@ export default class OrderGridProductQuantity extends LightningElement{
         this.template.querySelector('lightning-input').appendChild(style);
     }
 
+    //Updates the local quantity variable and sends it to orderGridTable via an event.
     changeQuantity(event){
         if(event.target.value >= 0){
             this._quantity = parseInt(event.target.value, 10);
-            console.log('quantity', this._quantity);
         }
         else{
             return;

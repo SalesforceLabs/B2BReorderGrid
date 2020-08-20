@@ -1,3 +1,11 @@
 .verticalSpacing{
     height: 0.8rem;
 }
+
+.alignTotal{
+    padding-left: 40%;
+}
+
+.errorMessage{
+    color: red;
+}

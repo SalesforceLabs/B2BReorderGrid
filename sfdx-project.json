@@ -1,11 +1,22 @@
 {
-  "packageDirectories": [
-    {
-      "path": "force-app",
-      "default": true
+    "packageDirectories": [
+        {
+            "path": "force-app",
+            "default": true,
+            "definitionFile": "config/project-scratch-def.json",
+            "package": "B2B Order Grid",
+            "versionName": "Test Release",
+            "versionNumber": "1.1.0.NEXT"
+        }
+    ],
+    "namespace": "B2BOG",
+    "sfdcLoginUrl": "https://login.salesforce.com",
+    "sourceApiVersion": "49.0",
+    "packageAliases": {
+        "B2B Order Grid": "0Ho3t000000Kyx1CAC",
+        "B2B Order Grid@1.0.0-1": "04t3t000002jVGEAA2",
+        "B2B Order Grid@1.0.0-2": "04t3t000002jZGIAA2",
+        "B2B Order Grid@1.0.0-3": "04t3t000002jcKOAAY",
+        "B2B Order Grid@1.1.0-1": "04t3t000002jcvnAAA"
     }
-  ],
-  "namespace": "",
-  "sfdcLoginUrl": "https://login.salesforce.com",
-  "sourceApiVersion": "48.0"
 }

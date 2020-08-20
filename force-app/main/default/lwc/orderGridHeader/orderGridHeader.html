@@ -1,12 +1,14 @@
 <template>
     <lightning-layout vertical-align="end">
-        <lightning-layout-item size="4" flexibility="auto">
+        <lightning-layout-item size="1" flexibility="auto">
             <label for="yearSelect" class="slds-form-element__label slds-no-flex">
                 Select Order Year
             </label>
             <select class="slds-select" name="yearSelect" onchange={selectYear}>
                 <template for:each={yearValues} for:item="year">
-                    <option value={year} key={year}>{year}</option>
+                    <option value={year} key={year}>
+                        &nbsp;&nbsp;{year}
+                    </option>
                 </template>
             </select>
         </lightning-layout-item>

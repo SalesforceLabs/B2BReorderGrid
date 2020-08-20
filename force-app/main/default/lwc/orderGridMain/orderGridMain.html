@@ -6,7 +6,8 @@
                 onselectyearevent={selectYearEventHandler}
                 onsearchevent={searchEventHandler}
                 onsortevent={sortEventHandler}
-                onresetquantitiesevent={resetQuantitiesEventHandler}>
+                onresetquantitiesevent={resetQuantitiesEventHandler}
+                if:true={orderProducts}>
             </c-order-grid-header>
             <br>
             <c-order-grid-table
@@ -19,6 +20,7 @@
                 onaddtocartevent={addToCartEventHandler}
                 if:true={orderProducts}>
             </c-order-grid-table>
+            <h1 if:true={showErrorMessage}>You have no orders or you aren't a community user.</h1>
         </div>
     </lightning-card>
 </template>

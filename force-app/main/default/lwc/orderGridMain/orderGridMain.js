@@ -1,10 +1,22 @@
+/*
+==========================================
+    Title: orderGridMain
+    Purpose: Main LWC for the order grid.
+        This is the LWC that is exposed
+        to the community builder.
+    Author: Clay Phillips
+    Date: 08/20/2020 
+==========================================
+*/
+
 import {LightningElement, wire, api} from 'lwc';
 import commId from '@salesforce/community/Id';
-import getOrderProducts from '@salesforce/apex/orderGridController.getOrderProducts';
-import addToCart from '@salesforce/apex/orderGridController.addToCart';
+import getOrderProducts from '@salesforce/apex/OrderGridController.getOrderProducts';
+import addToCart from '@salesforce/apex/OrderGridController.addToCart';
 import {ShowToastEvent} from 'lightning/platformShowToastEvent';
 
 export default class OrderGridMain extends LightningElement{
+    //Stores the Id of the account the community user is associated with.
     @api
     effectiveAccountId;
 
@@ -19,12 +31,15 @@ export default class OrderGridMain extends LightningElement{
         return resolved;
     }
 
+    //Stores the current community Id
     communityId = null;
 
     connectedCallback(){
         this.communityId = commId;
+        this.showErrorMessage = false;
     }
 
+    showErrorMessage;
     orderProducts = null;
     sortObject;
     orderYear;
@@ -33,46 +48,56 @@ export default class OrderGridMain extends LightningElement{
     resetQuantities;
 
     orderProductWrapperString = '';
-    imageURL = '';
 
+    //Wire method that calls getOrderProducts() from the apex controller and stores the results
+    //in the orderProducts variable
     @wire(getOrderProducts, {
         communityId: "$communityId",
         effectiveAccountId: "$resolvedEffectiveAccountId"
     })
     getOrderProductsTwo({error, data}){
-        console.log('effectiveAccountId', this.resolvedEffectiveAccountId);
-        
         if(data && data.length){
             this.orderProducts = data;
+            this.showErrorMessage = false;
+        }
+        else if(!data){
+            this.showErrorMessage = true;
         }
         else if(error){
             console.log('Error received: ' + JSON.stringify(error));
         }
     }
 
+    //Event handler for filtering the order products by year
     selectYearEventHandler(event){
         this.orderYear = event.detail.orderYear;
     }
 
+    //Event handler for searching for order products by name or SKU
     searchEventHandler(event){
         this.searchText = event.detail.searchText;
-        console.log('orderGridMain Search Text', this.searchText);
     }
 
+    //Event handler for sorting the order products
     sortEventHandler(event){
         this.sortObject = event.detail;
     }
 
+    //Event handler for resetting the product quantities in the table to 0
     resetQuantitiesEventHandler(event){
+        //Need a variable to pass down to the table so that I can call a method to reset the table quantities
         this.resetQuantities = event.detail.randomNumber;
     }
 
+    //Event handler to show/hide the order grid based on the year selected.
+    //If there are no orders for the year, the grid isn't shown.
     showTableEventHandler(event){
         this.showTable = event.detail.showTable;
     }
 
+    //Event handler for adding products to the user's cart.
+    //This calls the addToCart() method in the apex controller.
     addToCartEventHandler(event){
-        //console.log('communityId', this.communityId, 'effectiveAccountId', this.resolvedEffectiveAccountId);
         const cartProducts = event.detail.cartProducts;
         let totalQuantity = 0;
 
@@ -120,6 +145,7 @@ export default class OrderGridMain extends LightningElement{
         });
     }
 
+    //Method to show a toat message based on the results of the addToCart() call
     showToast(title, message, variant, mode) {
         const event = new ShowToastEvent({
             title,
