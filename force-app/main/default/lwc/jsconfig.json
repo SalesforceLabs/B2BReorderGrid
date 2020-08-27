@@ -1,0 +1,41 @@
+{
+    "compilerOptions": {
+        "experimentalDecorators": true,
+        "baseUrl": ".",
+        "paths": {
+            "c/orderGridHeader": [
+                "orderGridHeader/orderGridHeader.js"
+            ],
+            "c/orderGridMain": [
+                "orderGridMain/orderGridMain.js"
+            ],
+            "c/orderGridOPQuantity": [
+                "orderGridOPQuantity/orderGridOPQuantity.js"
+            ],
+            "c/orderGridProductQuantity": [
+                "orderGridProductQuantity/orderGridProductQuantity.js"
+            ],
+            "c/orderGridTable": [
+                "orderGridTable/orderGridTable.js"
+            ],
+            "c/orderGridTableDateColumnHeader": [
+                "orderGridTableDateColumnHeader/orderGridTableDateColumnHeader.js"
+            ],
+            "c/orderGridTableMainCell": [
+                "orderGridTableMainCell/orderGridTableMainCell.js"
+            ],
+            "c/orderGridTableQuantityInput": [
+                "orderGridTableQuantityInput/orderGridTableQuantityInput.js"
+            ]
+        }
+    },
+    "include": [
+        "**/*",
+        "../../../../.sfdx/typings/lwc/**/*.d.ts"
+    ],
+    "typeAcquisition": {
+        "include": [
+            "jest"
+        ]
+    }
+}
