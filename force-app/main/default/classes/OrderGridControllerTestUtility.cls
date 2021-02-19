@@ -36,7 +36,7 @@ public class OrderGridControllerTestUtility{
         Product2 product = new Product2();
         product.Name = 'test product 1231897';
         product.StockKeepingUnit = 'test';
-        product.CurrencyIsoCode = 'USD';
+        //product.CurrencyIsoCode = 'USD';
         product.IsActive = true;
         insert product;
 
@@ -56,7 +56,7 @@ public class OrderGridControllerTestUtility{
     //Method to create a test Price Book Entry record.
     private static String createPriceBookEntry(String productId, String pbId){
         PricebookEntry pbe = new PricebookEntry();
-        pbe.CurrencyIsoCode = 'USD';
+        //pbe.CurrencyIsoCode = 'USD';
         pbe.Product2Id = productId;
         pbe.Pricebook2Id = pbId;
         pbe.IsActive = true;
@@ -71,7 +71,7 @@ public class OrderGridControllerTestUtility{
     private static String createAccount(){
         Account account = new Account();
         account.Name = 'Test Account';
-        account.CurrencyIsoCode = 'USD';
+        //account.CurrencyIsoCode = 'USD';
         insert account;
 
         return account.Id;
@@ -123,7 +123,7 @@ public class OrderGridControllerTestUtility{
     private static String createOrder(String accountId, String pbId, String userId){
         Order order = new Order();
         order.AccountId = accountId;
-        order.CurrencyIsoCode = 'USD';
+        //order.CurrencyIsoCode = 'USD';
         order.Status = 'Draft';
         order.EffectiveDate = System.Today();
         order.OrderedDate = System.now();

@@ -4,7 +4,8 @@
     Purpose: This is the controller for
         the orderGridMain LWC. 
     Author: Clay Phillips
-    Date: 08/20/2020 
+    Created Date: 08/24/2020 
+    Last Modified Date: 01/26/2021 
 ==========================================
 */
 
@@ -22,8 +23,6 @@ public with sharing class OrderGridController{
             return null;
         }
 
-        //System.debug('communityId: ' + communityId + ' effectiveAccountId: ' + effectiveAccountId);
-
         Id currentUserId = UserInfo.getUserId();
 
         List<OrderItem> orderProducts = [SELECT Id,
@@ -36,7 +35,7 @@ public with sharing class OrderGridController{
                                             FROM OrderItem
                                             WHERE Order.OwnerId = :currentUserId
                                             AND Order.Status = 'Activated'
-                                            ORDER BY Order.OrderedDate ASC];
+                                            ORDER BY Order.OrderedDate DESC];
         
         //Stores the list of order products returned by the SOQL query. This list doesn't doesn't contain the
         //product image information which requires a connect API call.
@@ -254,7 +253,7 @@ public with sharing class OrderGridController{
     @TestVisible
     private static Boolean canReadOrderProducts(){
         Boolean canReadOrderProducts = false;
-        if(Schema.sObjectType.OrderItem.fields.Quantity.isAccessible()){
+        if(Schema.sObjectType.OrderItem.isAccessible() && Schema.sObjectType.OrderItem.fields.Quantity.isAccessible()){
             canReadOrderProducts = true;
         }
         return canReadOrderProducts;
@@ -264,8 +263,9 @@ public with sharing class OrderGridController{
     @TestVisible
     private static Boolean canReadOrders(){
         Boolean canReadOrders = false;
-        if(Schema.sObjectType.Order.fields.OrderedDate.isAccessible() &&
-           Schema.sObjectType.Order.fields.OwnerId.isAccessible()){
+        if(Schema.sObjectType.Order.isAccessible() &&
+            Schema.sObjectType.Order.fields.OrderedDate.isAccessible() &&
+            Schema.sObjectType.Order.fields.OwnerId.isAccessible()){
             canReadOrders = true;
         }
         return canReadOrders;
@@ -275,8 +275,9 @@ public with sharing class OrderGridController{
     @TestVisible
     private static Boolean canReadProducts(){
         Boolean canReadProducts = false;
-        if(Schema.sObjectType.Product2.fields.Name.isAccessible() &&
-           Schema.sObjectType.Product2.fields.StockKeepingUnit.isAccessible()){
+        if(Schema.sObjectType.Product2.isAccessible() &&
+            Schema.sObjectType.Product2.fields.Name.isAccessible() &&
+            Schema.sObjectType.Product2.fields.StockKeepingUnit.isAccessible()){
             canReadProducts = true;
         }
         return canReadProducts;
@@ -286,8 +287,9 @@ public with sharing class OrderGridController{
     @TestVisible
     private static Boolean canReadWebStoreNetworks(){
         Boolean canReadWebStoreNetworks = false;
-        if(Schema.sObjectType.WebStoreNetwork.fields.WebStoreId.isAccessible() &&
-           Schema.sObjectType.WebStoreNetwork.fields.NetworkId.isAccessible()){
+        if(Schema.sObjectType.WebStoreNetwork.isAccessible() &&
+            Schema.sObjectType.WebStoreNetwork.fields.WebStoreId.isAccessible() &&
+            Schema.sObjectType.WebStoreNetwork.fields.NetworkId.isAccessible()){
             canReadWebStoreNetworks = true;
         }
         return canReadWebStoreNetworks;

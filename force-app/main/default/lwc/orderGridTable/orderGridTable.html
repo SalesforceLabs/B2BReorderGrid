@@ -69,6 +69,14 @@
         </table>
         <p class="verticalSpacing"></p>
         <lightning-layout vertical-align="end">
+            <lightning-layout-item alignment-bump="right">
+                <c-pagination
+                    class="slds-float_left"    
+                    number-of-pages={numberOfPages}
+                    current-page-number={pageNumber}
+                    onpaginationevent={paginationEventHandler}>
+                </c-pagination>
+            </lightning-layout-item>
             <lightning-layout-item alignment-bump="left">
                 <lightning-button
                     variant="brand"
