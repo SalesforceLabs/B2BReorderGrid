@@ -36,11 +36,6 @@ export default class OrderGridMain extends LightningElement{
     //Stores the current community Id
     communityId = null;
 
-    connectedCallback(){
-        this.communityId = commId;
-        this.showErrorMessage = false;
-    }
-
     showErrorMessage;
     orderProducts = null;
     cartURL;
@@ -52,6 +47,12 @@ export default class OrderGridMain extends LightningElement{
     resetQuantities;
 
     _webstoreId;
+
+    connectedCallback(){
+        this.communityId = commId;
+        this.showErrorMessage = false;
+        this.showTable = false;
+    }
 
     //Wire method that calls getOrderProducts() from the apex controller and stores the results
     //in the orderProducts variable
@@ -115,6 +116,7 @@ export default class OrderGridMain extends LightningElement{
     //If there are no orders for the year, the grid isn't shown.
     showTableEventHandler(event){
         this.showTable = event.detail.showTable;
+        console.log('showTable', this.showTable);
     }
 
     //Event handler for adding products to the user's cart.

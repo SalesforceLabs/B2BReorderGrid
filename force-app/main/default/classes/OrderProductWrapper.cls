@@ -8,7 +8,7 @@
 ==========================================
 */
 
-public class OrderProductWrapper{
+public with sharing class OrderProductWrapper{
     @AuraEnabled
     public String Id{get;set;}
 

@@ -47,6 +47,8 @@ export default class OrderGridTable extends LightningElement{
     @api cartURL;
     @api cartItems;
 
+    showTable = false;
+
     //Setter for searchText that calls the filterOrderProductsByNameSKU() method
     //if there is search text or shows all of the OPs again if there isn't any search text.
     set searchText(value){
@@ -56,6 +58,7 @@ export default class OrderGridTable extends LightningElement{
         }
         else{
             this.filteredOrderProducts = this.filteredOrderProductsCopy;
+            this.orders = [];
             this.orderColumns = [];
             this.orderColumnStrings = [];
             this.tableRows = [];
@@ -85,6 +88,7 @@ export default class OrderGridTable extends LightningElement{
 
     //Needed for searching to store the original order product list without filters
     filteredOrderProductsCopy = [];
+    orders = [];
     orderColumns = [];
     orderColumnStrings = [];
     tableRows = [];
@@ -93,12 +97,14 @@ export default class OrderGridTable extends LightningElement{
     productQuantities = [];
     totalProductQuantity = 0;
 
-    showTable = false;
     showNoOrdersMessage = false;
     showNoMatchingProductsMessage = false;
 
     addToCartDisabled = true;
 
+    //For order pagination
+    numberOfPages = 1;
+    pageNumber = 1;
 
     //Filters the order products by year
     filterOrderProductsByYear(){
@@ -114,10 +120,11 @@ export default class OrderGridTable extends LightningElement{
             if(orderedDate.getFullYear() === this._orderYear){
                 this.filteredOrderProducts.push(op);
             }
-        }) 
+        })
         
         if(this.filteredOrderProducts.length > 0){
             this.filteredOrderProductsCopy = this.filteredOrderProducts;
+            this.orders = [];
             this.orderColumns = [];
             this.orderColumnStrings = [];
             this.tableRows = [];
@@ -169,67 +176,98 @@ export default class OrderGridTable extends LightningElement{
 
     //Parses the order items and creates the table
     createTable(){
+        this.showNoMatchingProductsMessage = false;
         this.parseOrderItems();
         this.createTableRows();
     }
 
     //Creates the date column headers and product array needed for the table
     parseOrderItems(){
-        this.filteredOrderProducts.forEach((op) =>{
-            this.createDateColumnHeader(op);
-            this.createProductArray(op);
-        })
+        this.createOrderArray(this.filteredOrderProducts);
+        this.createOrderColumns(this.orders);
+        this.createProductArray(this.filteredOrderProducts);
+        this.numberOfPages = Math.ceil(this.orders.length / 5);
+    }
+
+    createOrderArray(filteredOrderProducts){
+        for(let a = 0; a < filteredOrderProducts.length; a++){
+            const op = filteredOrderProducts[a];
+            const order = {
+                orderId: op.orderId,
+                orderedDate: op.orderedDate
+            }
+
+            let orderFound = false;
+            for(let b = 0; b < this.orders.length; b++){
+                if(this.orders[b].orderId === order.orderId){
+                    orderFound = true;
+                    break;    
+                }
+            }
+            if(!orderFound){
+                this.orders.push(order);
+            }
+        }    
+        //console.log('orders', this.orders);
     }
 
     //Uses the OP Ordered Dates to date column headers for the table 
-    createDateColumnHeader(op){
-        const orderedDateRaw = new Date(op.orderedDate);
-        const orderedDate = new Date(orderedDateRaw.getTime() + orderedDateRaw.getTimezoneOffset() * 60000); //needed to account for the time offset
-        
-        let columnLabel = this.getMonthString(orderedDate.getMonth()) + ' ';
-        columnLabel += orderedDate.getDate() + ', ' + orderedDate.getFullYear();
+    createOrderColumns(orders){
+        const offset = (this.pageNumber * 5) - 5;
+        const orderArrayEndpoint = ((this.pageNumber * 5 < orders.length) ? this.pageNumber * 5 : orders.length);
 
-        const orderColumn = {
-            orderId: op.orderId,
-            label: columnLabel,
-            date: op.orderedDate
+        for(let a = offset; a < orderArrayEndpoint; a++){
+            const order = orders[a];
+            const orderedDateRaw = new Date(order.orderedDate);
+            const orderedDate = new Date(orderedDateRaw.getTime() + orderedDateRaw.getTimezoneOffset() * 60000); //needed to account for the time offset
+            
+            let columnLabel = this.getMonthString(orderedDate.getMonth()) + ' ';
+            columnLabel += orderedDate.getDate() + ', ' + orderedDate.getFullYear();
+
+            const orderColumn = {
+                orderId: order.orderId,
+                label: columnLabel,
+                date: order.orderedDate
+            }
+
+            this.orderColumns.push(orderColumn);
         }
-
-        if(this.orderColumnStrings.includes(JSON.stringify(orderColumn))){
-            return;
-        }
-
-        this.orderColumnStrings.push(JSON.stringify(orderColumn));
-        this.orderColumns.push(orderColumn);
+        //console.log('orderColumns', this.orderColumns);
     }
 
-    //Creates the array of products needed to create the table
-    createProductArray(op){
-        let productImageURL = '';
-        if(op.productImageURL){
-            productImageURL = op.productImageURL;
-        }
-        const productObject = {
-            Id: op.productId,
-            SKU: op.productSKU,
-            name: op.productName,
-            productImageURL: productImageURL,
-            quantityValues: []
-        }
+    createProductArray(filteredOrderProducts){
+        for(let a = 0; a < filteredOrderProducts.length; a++){
+            const op = filteredOrderProducts[a];
+            let productImageURL = '';
+            if(op.productImageURL){
+                productImageURL = op.productImageURL;
+            }
+            const productObject = {
+                Id: op.productId,
+                SKU: op.productSKU,
+                name: op.productName,
+                productImageURL: productImageURL,
+                quantityValues: []
+            }
 
-        const productObjectString = JSON.stringify(productObject);
-
-        if(this.productArray.includes(productObjectString)){
-            return;
+            let productFound = false;
+            for(let b = 0; b < this.productArray.length; b++){
+                if(this.productArray[b].Id === productObject.Id){
+                    productFound = true;
+                    break;    
+                }
+            }
+            if(!productFound){
+                this.productArray.push(productObject);
+            }
         }
-        
-        this.productArray.push(productObjectString);
+        //console.log('productArray', this.productArray);
     }
 
     //Creates the table row objects needed for the table
     createTableRows(){
         for(let i = 0; i < this.productArray.length; i++){
-            const productObject = JSON.parse(this.productArray[i]);
+            const productObject = this.productArray[i];
 
             for(let b = 0; b < this.orderColumns.length; b++){
                 const order = this.orderColumns[b];
@@ -262,8 +300,18 @@ export default class OrderGridTable extends LightningElement{
                 }
             }
             
-            this.tableRows.push(productObject);
+            let quantityGreaterThanZeroFound = false;
+            for(let d = 0; d < productObject.quantityValues.length; d++){
+                if(productObject.quantityValues[d].quantity > 0){
+                    quantityGreaterThanZeroFound = true;
+                    break;
+                }
+            }
+            if(quantityGreaterThanZeroFound){
+                this.tableRows.push(productObject);
+            }
         }
+        //console.log('this.tableRows', this.tableRows);
         this.tableRowOne = this.tableRows[0];
     }
 
@@ -508,6 +556,20 @@ export default class OrderGridTable extends LightningElement{
         window.open(window.location.href + this.cartURL, '_self');
     }
 
+    paginationEventHandler(event){
+        this.pageNumber = (event.detail.pageDirection === 'NEXT' ? this.pageNumber + 1 : this.pageNumber - 1);
+        this.filteredOrderProductsCopy = this.filteredOrderProducts;
+        this.orders = [];
+        this.orderColumns = [];
+        this.orderColumnStrings = [];
+        this.tableRows = [];
+        this.productArray = [];
+        this._sortObject = null;
+        this.createTable();
+        this.showNoOrdersMessage = false;
+        this.showTable = true;
+    }
+
     //Handler for the Add to Cart button that sends an event to orderGridMain
     //to call the apex method to add the products to the cart
     addToCart(){
@@ -522,4 +584,90 @@ export default class OrderGridTable extends LightningElement{
         });
         this.dispatchEvent(addToCartEvent);
     }
+
+    //Uses the OP Ordered Dates to date column headers for the table 
+    // createDateColumnHeader(op){
+    //     const orderedDateRaw = new Date(op.orderedDate);
+    //     const orderedDate = new Date(orderedDateRaw.getTime() + orderedDateRaw.getTimezoneOffset() * 60000); //needed to account for the time offset
+        
+    //     let columnLabel = this.getMonthString(orderedDate.getMonth()) + ' ';
+    //     columnLabel += orderedDate.getDate() + ', ' + orderedDate.getFullYear();
+
+    //     const orderColumn = {
+    //         orderId: op.orderId,
+    //         label: columnLabel,
+    //         date: op.orderedDate
+    //     }
+
+    //     if(this.orderColumnStrings.includes(JSON.stringify(orderColumn))){
+    //         return;
+    //     }
+
+    //     this.orderColumnStrings.push(JSON.stringify(orderColumn));
+    //     this.orderColumns.push(orderColumn);
+    // }
+
+    //Creates the array of products needed to create the table
+    // createProductArray(op){
+    //     let productImageURL = '';
+    //     if(op.productImageURL){
+    //         productImageURL = op.productImageURL;
+    //     }
+    //     const productObject = {
+    //         Id: op.productId,
+    //         SKU: op.productSKU,
+    //         name: op.productName,
+    //         productImageURL: productImageURL,
+    //         quantityValues: []
+    //     }
+
+    //     const productObjectString = JSON.stringify(productObject);
+
+    //     if(this.productArray.includes(productObjectString)){
+    //         return;
+    //     }
+        
+    //     this.productArray.push(productObjectString);
+    // }
+
+    //Creates the table row objects needed for the table
+    // createTableRows(){
+    //     for(let i = 0; i < this.productArray.length; i++){
+    //         const productObject = JSON.parse(this.productArray[i]);
+
+    //         for(let b = 0; b < this.orderColumns.length; b++){
+    //             const order = this.orderColumns[b];
+    //             let matchFound = false;
+
+    //             for(let c = 0; c < this.filteredOrderProducts.length; c++){
+    //                 if(this.filteredOrderProducts[c].productId === productObject.Id
+    //                     && this.filteredOrderProducts[c].orderId === order.orderId){
+    //                         const uniqueQuantityObj = {
+    //                             quantity: this.filteredOrderProducts[c].quantity,
+    //                             //Used as a unique key for the HTML for each loop
+    //                             uniqueQuantity: this.filteredOrderProducts[c].quantity + ' ' + Math.random() 
+    //                         };
+
+    //                         productObject.quantityValues.push(uniqueQuantityObj);
+    //                         matchFound = true;
+    //                         break;
+    //                 }
+    //             }
+
+    //             //Sets the quantiy to 0 for the order product for this particular order
+    //             //if there aren't any of this product in the order
+    //             if(!matchFound){
+    //                 const uniqueQuantityObj = {
+    //                     quantity: 0,
+    //                     uniqueQuantity: Math.random()
+    //                 };
+
+    //                 productObject.quantityValues.push(uniqueQuantityObj);
+    //             }
+    //         }
+            
+    //         this.tableRows.push(productObject);
+    //     }
+    //     this.tableRowOne = this.tableRows[0];
+    // }
 }
