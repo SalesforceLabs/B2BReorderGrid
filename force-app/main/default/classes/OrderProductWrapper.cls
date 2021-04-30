@@ -32,4 +32,13 @@ public with sharing class OrderProductWrapper{
 
     @AuraEnabled
     public String productImageURL{get;set;}
+
+    @AuraEnabled
+    public String attributeDeveloperName{get;set;}
+
+    @AuraEnabled
+    public Map<String, String> attributeMap{get;set;}
+
+    @AuraEnabled
+    public Map<String,ConnectApi.ProductAttributeSetInfo> attributeSetInfo{get;set;}
 }

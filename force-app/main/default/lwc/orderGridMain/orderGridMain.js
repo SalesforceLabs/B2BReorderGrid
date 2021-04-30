@@ -138,6 +138,17 @@ export default class OrderGridMain extends LightningElement{
             console.log('result', result);
 
             if(result){
+                // Refresh the cart icon
+                try {
+                    this.dispatchEvent(new CustomEvent("cartchanged", {
+                        bubbles: true,
+                        composed: true
+                    }));
+                }
+                catch (err) {
+                    console.log('error: ' + err);
+                }
+                
                 let title = '';
                 if(totalQuantity > 1){
                     title = 'Items Added to Cart';

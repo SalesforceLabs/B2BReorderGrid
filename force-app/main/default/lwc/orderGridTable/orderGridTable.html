@@ -24,12 +24,17 @@
             <tbody>
                 <template for:each={tableRows} for:item="tableRow">
                     <tr class="slds-hint-parent" key={tableRow.Id}>
-                        <th data-label="SKU" scope="row">
-                            <c-order-grid-table-main-cell
-                                product-name={tableRow.name}
-                                product-s-k-u={tableRow.SKU}
-                                product-image-u-r-l={tableRow.productImageURL}>
-                            </c-order-grid-table-main-cell>
+                        <th data-label="SKU" scope="row" style="white-space: break-spaces;">
+                            <a class="slds-text-link_reset" href={tableRow.productDetailURL}>
+                                <c-order-grid-table-main-cell
+                                    product-name={tableRow.name}
+                                    product-s-k-u={tableRow.SKU}
+                                    product-image-u-r-l={tableRow.productImageURL}
+                                    product-attribute-map={tableRow.attributeMap}
+                                    product-attribute-set-info={tableRow.attributeSetInfo}
+                                    product-attribute-developer-name={tableRow.attributeDeveloperName}>
+                                </c-order-grid-table-main-cell>
+                            </a>
                         </th>
                         <template for:each={tableRow.quantityValues} for:item="quantityObj">
                             <th data-label={quantityObj.quantity} scope="row" key={quantityObj.uniqueQuantity}>

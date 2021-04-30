@@ -9,6 +9,7 @@
 */
 
 import {LightningElement, api} from 'lwc';
+import BASE_PATH from "@salesforce/community/basePath";
 
 export default class OrderGridTable extends LightningElement{
     @api orderProducts;
@@ -46,6 +47,16 @@ export default class OrderGridTable extends LightningElement{
 
     @api cartURL;
     @api cartItems;
+
+    get communityName() {
+		let path = BASE_PATH;
+		let pos = BASE_PATH.lastIndexOf("/s");
+		if (pos >= 0) {
+			path = BASE_PATH.substring(0, pos);
+		}
+
+		return path;
+	}
 
     showTable = false;
 
@@ -240,14 +251,34 @@ export default class OrderGridTable extends LightningElement{
             const op = filteredOrderProducts[a];
             let productImageURL = '';
             if(op.productImageURL){
-                productImageURL = op.productImageURL;
+                // format image url
+                let url = op.productImageURL;
+
+                if (url.indexOf("/cms/delivery/media") >= 0) {
+                    const searchRegExp = /\/cms\/delivery\/media/g;
+
+                    url = url.replace(searchRegExp, this.communityName + "/cms/delivery/media");
+                }
+
+                if (url.indexOf("/cms/media") >= 0) {
+                    const searchRegExp = /\/cms\/media/g;
+
+                    url = url.replace(searchRegExp, this.communityName + "/cms/delivery/media");
+                }
+
+                productImageURL = url;
             }
+            let productDetailURL = BASE_PATH + "/product/" + op.productId;
             const productObject = {
                 Id: op.productId,
                 SKU: op.productSKU,
                 name: op.productName,
                 productImageURL: productImageURL,
-                quantityValues: []
+                quantityValues: [],
+                productDetailURL: productDetailURL,
+                attributeMap: op.attributeMap,
+                attributeSetInfo: op.attributeSetInfo,
+                attributeDeveloperName: op.attributeDeveloperName
             }
 
             let productFound = false;
@@ -553,7 +584,7 @@ export default class OrderGridTable extends LightningElement{
 
     //Handler for the View Cart button that takes the user to the cart detail page
     viewCart(){
-        window.open(window.location.href + this.cartURL, '_self');
+        window.open(BASE_PATH + '/' + this.cartURL, '_self');
     }
 
     paginationEventHandler(event){

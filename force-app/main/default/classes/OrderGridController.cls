@@ -65,7 +65,6 @@ public with sharing class OrderGridController{
                 productIds.add((String)op.Product2.Id);
             }
 
-            String baseURL = getURLBase();
             List<String> productIdList = new List<String>(productIds); 
             List<ConnectApi.ProductDetail> products = new List<ConnectApi.ProductDetail>();
             String webstoreId = getStoreId(communityId);
@@ -87,13 +86,13 @@ public with sharing class OrderGridController{
                 for(ConnectApi.ProductDetail product : products){
                     if(product.id == opw.productId){
                         if(product.defaultImage.url != null){
-                            //Logic to determine if the product image is a URL or a reference to a CMS image
-                            if(product.defaultImage.url.containsIgnoreCase('http') || product.defaultImage.url.containsIgnoreCase('www')){
-                                opw.productImageURL = product.defaultImage.url;
-                            }
-                            else{
-                                opw.productImageURL = baseURL + product.defaultImage.url;
-                            }
+                            opw.productImageURL = product.defaultImage.url;
+                        }
+                        if(product.variationAttributeSet != null)
+                        {
+                            opw.attributeDeveloperName = product.variationAttributeSet.developerName;
+                            opw.attributeMap = (Map<String,String>)product.variationAttributeSet.attributes;
+                            opw.attributeSetInfo = (Map<String,ConnectApi.ProductAttributeSetInfo>)product.attributeSetInfo;
                         }
                         productFound = true;
                         break;
@@ -236,17 +235,6 @@ public with sharing class OrderGridController{
         }
 
         return products;
-    }
-
-    //Method that gets the URL base for the product image URLs. Using custom metadata since the Domain SOQL query
-    //doesn't return the correct Domain. 
-    @TestVisible
-    private static String getURLBase(){
-        List<Domain__mdt> domains = [SELECT Id, DeveloperName, Domain__c FROM Domain__mdt WHERE DeveloperName = 'My_Domain'];
-        String domain = domains.get(0).Domain__c;
-    
-        String baseURL = 'https://' + domain + '--c.documentforce.com';
-        return baseURL;
     }
 
     //Method that determines whether the user can access order products. 

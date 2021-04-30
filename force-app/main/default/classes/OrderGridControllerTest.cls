@@ -31,7 +31,7 @@ private class OrderGridControllerTest{
         opw.productName = product.Name;
         opw.productSKU = product.StockKeepingUnit;
         opw.quantity = orderProduct.Quantity;
-        opw.productImageURL = OrderGridController.getURLBase();
+        opw.productImageURL = '';
 
         List<OrderProductWrapper> opwList = new List<OrderProductWrapper>();
         opwList.add(opw);
@@ -57,7 +57,7 @@ private class OrderGridControllerTest{
         System.assertEquals(opwList[0].productName, opwListFromMethod[0].productName);
         System.assertEquals(opwList[0].productSKU, opwListFromMethod[0].productSKU);
         System.assertEquals(opwList[0].quantity, opwListFromMethod[0].quantity);
-        System.assertEquals(opwList[0].productImageURL, opwListFromMethod[0].productImageURL);
+        System.assertEquals(opwList[0].productImageURL, '');
     }
 
     //Test method to test the getOrderProducts() method when it returns null because there are no order products.  
